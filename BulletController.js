@@ -25,6 +25,15 @@ export default class BulletController {
         }
     }
 
+    collideWith(sprite) {
+        const bulletTahtHitSpriteIndex = this.bullets.findIndex(bullet => bullet.collideWith(sprite));
+        if(bulletTahtHitSpriteIndex >= 0){
+            this.bullets.splice(bulletTahtHitSpriteIndex, 1);
+            return true;
+        }
+        return false;
+    }
+
     shoot(x, y, velocity, timeTillNextBulletAllowed = 0){
         if(this.timeTillNextBulletAllowed <= 0 && this.bullets.length < this.maxBulletsAtATime){
             const bullet = new Bullet(this.canvas, x, y, velocity, this.bulletColor);

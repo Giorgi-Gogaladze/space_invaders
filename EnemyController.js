@@ -16,7 +16,7 @@ export default class EnemyController{
     currentDirection = MovingDirection.right;
     xVelocity = 0;
     yVelocity = 0;
-    defaultXVelocity = 0;
+    defaultXVelocity = 1;
     defaultYVelocity = 1;
     moveDownTimerDefault = 30;
     moveDownTimer = this.moveDownTimerDefault;
@@ -24,17 +24,35 @@ export default class EnemyController{
     fireBulletTimer = this.fireBulletTimerDefault;
 
 
-    constructor(canvas, enemyBulletController) {
+    constructor(canvas, enemyBulletController, playerBulletController) {
         this.enemyBulletController = enemyBulletController;
         this.canvas = canvas;
+        this.playerBulletController = playerBulletController;
+        this.enemyDeathSound = new Audio('sounds/enemy-death.wav');
+        this.enemyDeathSound.volume = 0.5;
+
         this.createEnemies();
     }
     draw(ctx){
         this.decrementMoveDownTimer();
         this.updateVelocityAndDirection();
+        this.collisionDetection();
         this.drawEnemies(ctx);
         this.resetMoveDownTimer();
         this.fireBullet();
+    }
+
+    collisionDetection() {
+        this.enemyRows.forEach(enemyRow => {
+            enemyRow.forEach((enemy, enemyIndex) => {
+                if(this.playerBulletController.collideWith(enemy)){
+                    this.enemyDeathSound.currentTime = 0;
+                    this.enemyDeathSound.play();
+                    enemyRow.splice(enemyIndex, 1);
+                }
+            })
+        });
+        this.enemyRows = this.enemyRows.filter(enemyRow => enemyRow.length > 0);
     }
 
     fireBullet() {
